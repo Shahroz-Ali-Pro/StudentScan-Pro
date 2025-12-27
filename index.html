@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="StudentScan">
+<link rel="apple-touch-icon" href="https://via.placeholder.com/192/2563eb/ffffff?text=SS">
+
+<link rel="manifest" href="manifest.json">
+
+<script>
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js');
+    }
+</script>
+    <title>StudentScan Pro | Advanced Suite</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root { --blue: #2563eb; --dark: #1e293b; --gray: #f1f5f9; }
+        body { font-family: 'Inter', sans-serif; background: #f8fafc; margin: 0; color: var(--dark); padding-bottom: 50px; }
+        nav { background: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo { font-weight: 800; color: var(--blue); font-size: 1.4rem; }
+        .container { max-width: 850px; margin: 30px auto; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; }
+        label { display: block; font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 6px; }
+        input { width: 100%; padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 1rem; margin-bottom: 15px; box-sizing: border-box; }
+        .toggle-section { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; background: var(--gray); padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .upload-area { border: 2px dashed #cbd5e1; padding: 40px; text-align: center; border-radius: 12px; cursor: pointer; background: var(--gray); transition: 0.3s; }
+        .upload-area:hover { border-color: var(--blue); background: #eff6ff; }
+        .gallery { display: flex; flex-direction: column; gap: 12px; margin-top: 25px; }
+        .thumb-item { display: flex; align-items: center; background: white; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; gap: 15px; }
+        .thumb-item img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; }
+        .controls { display: flex; gap: 8px; margin-left: auto; }
+        .ctrl-btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.2s; }
+        .btn-up { background: #f1f5f9; color: var(--blue); } .btn-down { background: #f1f5f9; color: var(--blue); } .btn-del { background: #fee2e2; color: #ef4444; }
+        .btn-primary { width: 100%; background: var(--blue); color: white; border: none; padding: 20px; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+        #status { text-align: center; margin-top: 15px; font-weight: 600; color: var(--blue); font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+<nav><div class="logo">STUDENTSCAN PRO</div></nav>
+
+<div class="container">
+    <div class="card">
+        <div class="toggle-section">
+            <input type="checkbox" id="useHeader" checked style="width: 20px; height: 20px; cursor: pointer;">
+            <label style="margin: 0; cursor: pointer; font-size: 0.9rem;" for="useHeader">Enable Professional Header (First Page Only)</label>
+        </div>
+
+        <div id="headerFields">
+            <label>Student Name</label>
+            <input type="text" id="name" placeholder="Enter your full name">
+            <label>Title (Hint: Presentation, Assignment, Lab Report)</label>
+            <input type="text" id="subject" placeholder="e.g. Microbiology Assignment">
+        </div>
+        
+        <div class="upload-area" onclick="document.getElementById('fileIn').click()">
+            <strong style="color:var(--blue)">+ Upload Images</strong>
+            <p style="margin: 5px 0 0; color: #64748b; font-size: 0.85rem;">Select one or multiple photos (you can reorder them below)</p>
+            <input type="file" id="fileIn" accept="image/*" multiple hidden>
+        </div>
+
+        <div class="gallery" id="gallery"></div>
+    </div>
+
+    <div class="card">
+        <button class="btn-primary" id="genBtn" onclick="generatePDF()">Generate Academic PDF</button>
+        <div id="status">Ready</div>
+    </div>
+</div>
+
+<script>
+    let filesArray = [];
+    const gallery = document.getElementById('gallery');
+    const useHeader = document.getElementById('useHeader');
+
+    useHeader.onchange = () => {
+        document.getElementById('headerFields').style.opacity = useHeader.checked ? "1" : "0.3";
+        document.getElementById('headerFields').style.pointerEvents = useHeader.checked ? "all" : "none";
+    };
+
+    document.getElementById('fileIn').onchange = (e) => {
+        const newFiles = Array.from(e.target.files);
+        newFiles.forEach(file => {
+            filesArray.push({ id: Date.now() + Math.random(), data: file, url: URL.createObjectURL(file) });
+        });
+        updateUI();
+        e.target.value = ''; 
+    };
+
+    function updateUI() {
+        gallery.innerHTML = '';
+        filesArray.forEach((fileObj, index) => {
+            const div = document.createElement('div');
+            div.className = 'thumb-item';
+            div.innerHTML = `
+                <span style="font-weight: bold; color: #94a3b8;">${index + 1}</span>
+                <img src="${fileObj.url}">
+                <div class="controls">
+                    <button class="ctrl-btn btn-up" onclick="move(${index}, -1)">↑</button>
+                    <button class="ctrl-btn btn-down" onclick="move(${index}, 1)">↓</button>
+                    <button class="ctrl-btn btn-del" onclick="remove(${index})">×</button>
+                </div>
+            `;
+            gallery.appendChild(div);
+        });
+    }
+
+    function move(index, direction) {
+        const newPos = index + direction;
+        if (newPos >= 0 && newPos < filesArray.length) {
+            [filesArray[index], filesArray[newPos]] = [filesArray[newPos], filesArray[index]];
+            updateUI();
+        }
+    }
+
+    function remove(index) {
+        filesArray.splice(index, 1);
+        updateUI();
+    }
+
+    async function generatePDF() {
+        if (filesArray.length === 0) return alert("Upload images first!");
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const studentName = document.getElementById('name').value || "Student";
+        const subject = document.getElementById('subject').value || "Academic Document";
+
+        document.getElementById('status').innerText = "Processing PDF...";
+
+        for (let i = 0; i < filesArray.length; i++) {
+            if (i > 0) doc.addPage();
+            const imgData = await new Promise(r => {
+                const reader = new FileReader();
+                reader.onload = (e) => r(e.target.result);
+                reader.readAsDataURL(filesArray[i].data);
+            });
+
+            let yPos = 10;
+            // HEADER ON PAGE 1 (MODIFIED LABEL)
+            if (i === 0 && useHeader.checked) {
+                doc.setFillColor(37, 99, 235);
+                doc.rect(0, 0, 210, 42, 'F');
+                doc.setTextColor(255, 255, 255);
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(20);
+                doc.text(subject.toUpperCase(), 10, 18);
+                doc.setFontSize(10);
+                doc.setFont("helvetica", "normal");
+                // Label changed to just "NAME:"
+                doc.text(`NAME: ${studentName.toUpperCase()}`, 10, 30);
+                doc.text(`DATE: ${new Date().toLocaleDateString()}`, 10, 36);
+                yPos = 52;
+            }
+
+            // IMAGE
+            const props = doc.getImageProperties(imgData);
+            const ratio = props.height / props.width;
+            const pdfW = 190;
+            const pdfH = Math.min(pdfW * ratio, 220);
+            doc.addImage(imgData, 'JPEG', 10, yPos, pdfW, pdfH);
+
+            // FOOTER
+            const footerY = 288;
+            doc.setDrawColor(226, 232, 240);
+            doc.line(10, footerY - 4, 200, footerY - 4);
+            doc.setTextColor(148, 163, 184);
+            doc.setFontSize(8);
+            doc.text(`Student: ${studentName} | StudentScan Pro`, 10, footerY);
+            doc.text(`Page ${i + 1} of ${filesArray.length}`, 180, footerY);
+        }
+
+        doc.save(`${subject}_StudentScan.pdf`);
+        document.getElementById('status').innerText = "Downloaded!";
+    }
+</script>
+</body>
+</html>
