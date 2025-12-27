@@ -178,5 +178,65 @@
         document.getElementById('status').innerText = "Downloaded!";
     }
 </script>
+    <footer style="margin-top: 50px; padding: 20px; border-top: 1px solid #ddd; text-align: center; font-family: sans-serif; background: #fdfdfd;">
+    <p style="color: #666; font-size: 14px;">&copy; 2025 StudentScan Pro. Academic Document Formatter.</p>
+    <div style="margin: 15px 0;">
+        <a href="javascript:void(0)" onclick="openLegal('about')" style="margin: 0 10px; color: #2563eb; text-decoration: none; font-weight: 500;">About Us</a> |
+        <a href="javascript:void(0)" onclick="openLegal('privacy')" style="margin: 0 10px; color: #2563eb; text-decoration: none; font-weight: 500;">Privacy Policy</a> |
+        <a href="javascript:void(0)" onclick="openLegal('terms')" style="margin: 0 10px; color: #2563eb; text-decoration: none; font-weight: 500;">Terms</a> |
+        <a href="javascript:void(0)" onclick="openLegal('contact')" style="margin: 0 10px; color: #2563eb; text-decoration: none; font-weight: 500;">Contact Us</a>
+    </div>
+
+    <div id="legalModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; overflow-y: auto; padding-top: 50px;">
+        <div style="background: white; margin: auto; padding: 30px; border-radius: 12px; max-width: 600px; width: 90%; position: relative; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+            <span onclick="closeLegal()" style="position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; color: #999;">&times;</span>
+            
+            <div id="content-about" class="legal-text" style="display:none;">
+                <h2 style="color: #1e293b;">About StudentScan Pro</h2>
+                <p>StudentScan Pro is a high-utility academic tool designed for students worldwide. We help bridge the gap between handwritten notes and professional academic submissions. Our mission is to provide a fast, secure, and easy-to-use platform that automates the formatting of multi-page PDF documents with professional headers, ensuring students can focus on their learning rather than formatting.</p>
+            </div>
+
+            <div id="content-privacy" class="legal-text" style="display:none;">
+                <h2 style="color: #1e293b;">Privacy Policy</h2>
+                <p>This Privacy Policy outlines how we handle your data. <strong>Your privacy is our absolute priority.</strong></p>
+                <ul>
+                    <li><strong>No Image Storage:</strong> All photo-to-PDF processing happens locally in your browser. We never upload or store your images on our servers.</li>
+                    <li><strong>AdSense & Cookies:</strong> We use Google AdSense to serve ads. Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this or other websites.</li>
+                    <li><strong>Opt-Out:</strong> You can opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank">Google Ad Settings</a>.</li>
+                </ul>
+            </div>
+
+            <div id="content-terms" class="legal-text" style="display:none;">
+                <h2 style="color: #1e293b;">Terms of Service</h2>
+                <p>By using StudentScan Pro, you agree to use this tool for lawful academic and personal purposes only. We provide this service "as is" and are not responsible for formatting errors or data loss. You must ensure you have the rights to any content you convert using our platform.</p>
+            </div>
+
+            <div id="content-contact" class="legal-text" style="display:none;">
+                <h2 style="color: #1e293b;">Contact Us</h2>
+                <p>We are always looking to improve! If you have suggestions, bug reports, or partnership inquiries, please reach out to our team.</p>
+                <p style="background: #f1f5f9; padding: 15px; border-left: 4px solid #2563eb;"><strong>Official Email:</strong> shahrozali.lap@gmail.com</p>
+                <p style="font-size: 12px; color: #64748b;">(Note to AdSense: This is the primary point of contact for this domain.)</p>
+            </div>
+
+            <button onclick="closeLegal()" style="margin-top: 25px; background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; width: 100%;">Close</button>
+        </div>
+    </div>
+</footer>
+
+<script>
+function openLegal(id) {
+    document.getElementById('legalModal').style.display = 'block';
+    // Hide all text first
+    document.querySelectorAll('.legal-text').forEach(div => div.style.display = 'none');
+    // Show the specific one
+    document.getElementById('content-' + id).style.display = 'block';
+    document.body.style.overflow = 'hidden'; // Stop scrolling background
+}
+function closeLegal() {
+    document.getElementById('legalModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+</script>
 </body>
+
 </html>
