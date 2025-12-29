@@ -4,18 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="StudentScan">
-<link rel="apple-touch-icon" href="icon.png">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="StudentScan">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="manifest" href="manifest.json">
 
-<link rel="manifest" href="manifest.json">
-
-<script>
-    // Register Service Worker for PWA
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
-    }
-</script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
     <title>StudentScan Pro | Advanced Suite</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -26,16 +24,19 @@
         .container { max-width: 850px; margin: 30px auto; padding: 20px; }
         .card { background: white; padding: 25px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 25px; }
         label { display: block; font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 6px; }
-        input { width: 100%; padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 1rem; margin-bottom: 15px; box-sizing: border-box; }
+        input[type="text"] { width: 100%; padding: 12px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 1rem; margin-bottom: 15px; box-sizing: border-box; }
         .toggle-section { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; background: var(--gray); padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; }
-        .upload-area { border: 2px dashed #cbd5e1; padding: 40px; text-align: center; border-radius: 12px; cursor: pointer; background: var(--gray); transition: 0.3s; }
+        
+        /* UNIVERSAL UPLOAD AREA FIX */
+        .upload-area { display: block; border: 2px dashed #cbd5e1; padding: 40px; text-align: center; border-radius: 12px; cursor: pointer; background: var(--gray); transition: 0.3s; }
         .upload-area:hover { border-color: var(--blue); background: #eff6ff; }
+        
         .gallery { display: flex; flex-direction: column; gap: 12px; margin-top: 25px; }
         .thumb-item { display: flex; align-items: center; background: white; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; gap: 15px; }
         .thumb-item img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; }
         .controls { display: flex; gap: 8px; margin-left: auto; }
         .ctrl-btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.2s; }
-        .btn-up { background: #f1f5f9; color: var(--blue); } .btn-down { background: #f1f5f9; color: var(--blue); } .btn-del { background: #fee2e2; color: #ef4444; }
+        .btn-up, .btn-down { background: #f1f5f9; color: var(--blue); } .btn-del { background: #fee2e2; color: #ef4444; }
         .btn-primary { width: 100%; background: var(--blue); color: white; border: none; padding: 20px; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
         #status { text-align: center; margin-top: 15px; font-weight: 600; color: var(--blue); font-size: 0.9rem; }
     </style>
@@ -58,11 +59,11 @@
             <input type="text" id="subject" placeholder="e.g. Microbiology Assignment">
         </div>
         
-        <div class="upload-area" onclick="document.getElementById('fileIn').click()">
+        <label class="upload-area" for="fileIn">
             <strong style="color:var(--blue)">+ Upload Images</strong>
-            <p style="margin: 5px 0 0; color: #64748b; font-size: 0.85rem;">Select one or multiple photos (you can reorder them below)</p>
-            <input type="file" id="fileIn" accept="image/*" multiple hidden>
-        </div>
+            <p style="margin: 5px 0 0; color: #64748b; font-size: 0.85rem;">Select one or multiple photos</p>
+            <input type="file" id="fileIn" accept="image/*" multiple="multiple" hidden>
+        </label>
 
         <div class="gallery" id="gallery"></div>
     </div>
@@ -77,16 +78,19 @@
     let filesArray = [];
     const gallery = document.getElementById('gallery');
     const useHeader = document.getElementById('useHeader');
+    const fileInput = document.getElementById('fileIn');
 
     useHeader.onchange = () => {
         document.getElementById('headerFields').style.opacity = useHeader.checked ? "1" : "0.3";
         document.getElementById('headerFields').style.pointerEvents = useHeader.checked ? "all" : "none";
     };
 
-    document.getElementById('fileIn').onchange = (e) => {
+    fileInput.onchange = (e) => {
         const newFiles = Array.from(e.target.files);
         newFiles.forEach(file => {
-            filesArray.push({ id: Date.now() + Math.random(), data: file, url: URL.createObjectURL(file) });
+            if(file.type.startsWith('image/')) {
+                filesArray.push({ id: Date.now() + Math.random(), data: file, url: URL.createObjectURL(file) });
+            }
         });
         updateUI();
         e.target.value = ''; 
@@ -130,18 +134,28 @@
         const studentName = document.getElementById('name').value || "Student";
         const subject = document.getElementById('subject').value || "Academic Document";
 
-        document.getElementById('status').innerText = "Processing PDF...";
+        document.getElementById('status').innerText = "Optimizing & Generating PDF...";
 
         for (let i = 0; i < filesArray.length; i++) {
             if (i > 0) doc.addPage();
-            const imgData = await new Promise(r => {
-                const reader = new FileReader();
-                reader.onload = (e) => r(e.target.result);
-                reader.readAsDataURL(filesArray[i].data);
+            
+            // FIX: COMPRESSION ENGINE to prevent crashing
+            const imgData = await new Promise(resolve => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const maxW = 1200; 
+                    const scale = Math.min(1, maxW / img.width);
+                    canvas.width = img.width * scale;
+                    canvas.height = img.height * scale;
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+                };
+                img.src = filesArray[i].url;
             });
 
             let yPos = 10;
-            // HEADER ON PAGE 1 (MODIFIED LABEL)
             if (i === 0 && useHeader.checked) {
                 doc.setFillColor(37, 99, 235);
                 doc.rect(0, 0, 210, 42, 'F');
@@ -151,20 +165,16 @@
                 doc.text(subject.toUpperCase(), 10, 18);
                 doc.setFontSize(10);
                 doc.setFont("helvetica", "normal");
-                // Label changed to just "NAME:"
                 doc.text(`NAME: ${studentName.toUpperCase()}`, 10, 30);
                 doc.text(`DATE: ${new Date().toLocaleDateString()}`, 10, 36);
                 yPos = 52;
             }
 
-            // IMAGE
             const props = doc.getImageProperties(imgData);
-            const ratio = props.height / props.width;
             const pdfW = 190;
-            const pdfH = Math.min(pdfW * ratio, 220);
-            doc.addImage(imgData, 'JPEG', 10, yPos, pdfW, pdfH);
+            const pdfH = (props.height * pdfW) / props.width;
+            doc.addImage(imgData, 'JPEG', 10, yPos, pdfW, Math.min(pdfH, 280 - yPos));
 
-            // FOOTER
             const footerY = 288;
             doc.setDrawColor(226, 232, 240);
             doc.line(10, footerY - 4, 200, footerY - 4);
@@ -178,7 +188,8 @@
         document.getElementById('status').innerText = "Downloaded!";
     }
 </script>
-    <footer style="margin-top: 50px; padding: 20px; border-top: 1px solid #ddd; text-align: center; font-family: sans-serif; background: #fdfdfd;">
+
+<footer style="margin-top: 50px; padding: 20px; border-top: 1px solid #ddd; text-align: center; font-family: sans-serif; background: #fdfdfd;">
     <p style="color: #666; font-size: 14px;">&copy; 2025 StudentScan Pro. Academic Document Formatter.</p>
     <div style="margin: 15px 0;">
         <a href="javascript:void(0)" onclick="openLegal('about')" style="margin: 0 10px; color: #2563eb; text-decoration: none; font-weight: 500;">About Us</a> |
@@ -190,34 +201,22 @@
     <div id="legalModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; overflow-y: auto; padding-top: 50px;">
         <div style="background: white; margin: auto; padding: 30px; border-radius: 12px; max-width: 600px; width: 90%; position: relative; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
             <span onclick="closeLegal()" style="position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; color: #999;">&times;</span>
-            
             <div id="content-about" class="legal-text" style="display:none;">
                 <h2 style="color: #1e293b;">About StudentScan Pro</h2>
-                <p>StudentScan Pro is a high-utility academic tool designed for students worldwide. We help bridge the gap between handwritten notes and professional academic submissions. Our mission is to provide a fast, secure, and easy-to-use platform that automates the formatting of multi-page PDF documents with professional headers, ensuring students can focus on their learning rather than formatting.</p>
+                <p>StudentScan Pro is a high-utility academic tool designed for students worldwide.</p>
             </div>
-
             <div id="content-privacy" class="legal-text" style="display:none;">
                 <h2 style="color: #1e293b;">Privacy Policy</h2>
-                <p>This Privacy Policy outlines how we handle your data. <strong>Your privacy is our absolute priority.</strong></p>
-                <ul>
-                    <li><strong>No Image Storage:</strong> All photo-to-PDF processing happens locally in your browser. We never upload or store your images on our servers.</li>
-                    <li><strong>AdSense & Cookies:</strong> We use Google AdSense to serve ads. Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this or other websites.</li>
-                    <li><strong>Opt-Out:</strong> You can opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank">Google Ad Settings</a>.</li>
-                </ul>
+                <p>No Image Storage: All photo-to-PDF processing happens locally in your browser.</p>
             </div>
-
             <div id="content-terms" class="legal-text" style="display:none;">
                 <h2 style="color: #1e293b;">Terms of Service</h2>
-                <p>By using StudentScan Pro, you agree to use this tool for lawful academic and personal purposes only. We provide this service "as is" and are not responsible for formatting errors or data loss. You must ensure you have the rights to any content you convert using our platform.</p>
+                <p>Use for lawful academic purposes only.</p>
             </div>
-
             <div id="content-contact" class="legal-text" style="display:none;">
                 <h2 style="color: #1e293b;">Contact Us</h2>
-                <p>We are always looking to improve! If you have suggestions, bug reports, or partnership inquiries, please reach out to our team.</p>
-                <p style="background: #f1f5f9; padding: 15px; border-left: 4px solid #2563eb;"><strong>Official Email:</strong> shahrozali.lap@gmail.com</p>
-                <p style="font-size: 12px; color: #64748b;">(Note to AdSense: This is the primary point of contact for this domain.)</p>
+                <p>Email: shahrozali.lap@gmail.com</p>
             </div>
-
             <button onclick="closeLegal()" style="margin-top: 25px; background: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; width: 100%;">Close</button>
         </div>
     </div>
@@ -226,11 +225,9 @@
 <script>
 function openLegal(id) {
     document.getElementById('legalModal').style.display = 'block';
-    // Hide all text first
     document.querySelectorAll('.legal-text').forEach(div => div.style.display = 'none');
-    // Show the specific one
     document.getElementById('content-' + id).style.display = 'block';
-    document.body.style.overflow = 'hidden'; // Stop scrolling background
+    document.body.style.overflow = 'hidden';
 }
 function closeLegal() {
     document.getElementById('legalModal').style.display = 'none';
@@ -238,6 +235,4 @@ function closeLegal() {
 }
 </script>
 </body>
-
 </html>
-
