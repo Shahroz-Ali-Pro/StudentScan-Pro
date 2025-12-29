@@ -208,7 +208,28 @@
                 const w = 180;
                 const h = (props.height * w) / props.width;
                 doc.addImage(imgData, 'JPEG', 15, y, w, Math.min(h, 270 - y));
-                
+                <section class="container" style="margin-top: 40px; color: #475569; font-size: 0.95rem; line-height: 1.6;">
+    <div class="card">
+        <h2 style="color: var(--dark); font-size: 1.2rem;">Why Use StudentScan Pro for Academic Assignments?</h2>
+        <p>In the modern academic world, presentation matters as much as the content. <strong>StudentScan Pro</strong> was developed specifically to help students convert handwritten notes, diagrams, and lab reports into professional, submission-ready PDF documents.</p>
+        
+        <h3 style="color: var(--blue); font-size: 1rem; margin-top: 20px;">Key Features for Students:</h3>
+        <ul style="padding-left: 20px;">
+            <li><strong>Privacy First:</strong> Unlike other online converters, we do not upload your images to a server. All processing happens locally on your device.</li>
+            <li><strong>Academic Headers:</strong> Automatically add your name, subject, and date to the first page for a professional look.</li>
+            <li><strong>Optimized File Size:</strong> Our engine compresses high-resolution mobile photos into a lightweight PDF that is easy to upload to university portals like Canvas or Google Classroom.</li>
+            <li><strong>Offline Capability:</strong> Once installed as a PWA, you can generate PDFs even in exam halls or libraries without an internet connection.</li>
+        </ul>
+
+        <h3 style="color: var(--blue); font-size: 1rem; margin-top: 20px;">How to Convert Photos to PDF:</h3>
+        <ol style="padding-left: 20px;">
+            <li>Capture clear photos of your assignment pages in a well-lit area.</li>
+            <li>Enter your <strong>Full Name</strong> and <strong>Subject Title</strong> in the fields above.</li>
+            <li>Tap <strong>"+ Add Images"</strong> and select all your assignment photos.</li>
+            <li>Reorder the pages if necessary and click <strong>"Generate Professional PDF."</strong></li>
+        </ol>
+    </div>
+</section>
                 // FOOTER
                 doc.setTextColor(150);
                 doc.setFontSize(8);
@@ -242,3 +263,4 @@
 </script>
 </body>
 </html>
+
