@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudentScan Pro | Free Academic Image to PDF Converter</title>
-    <meta name="description" content="Convert assignment photos to professional PDFs with academic headers. Works offline and secure.">
+    <title>StudentScan Pro | Academic Image to PDF Suite</title>
+    <meta name="description" content="The ultimate student tool. Convert assignment photos to professional PDFs with academic headers. Works offline and secure.">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="manifest" href="manifest.json">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
@@ -27,15 +29,19 @@
         .upload-area { display: block; border: 2px dashed #cbd5e1; padding: 30px 20px; text-align: center; border-radius: 12px; cursor: pointer; background: var(--gray); transition: 0.3s; }
         .upload-area:hover { border-color: var(--blue); background: #eff6ff; }
         .gallery { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .thumb { display: flex; align-items: center; background: white; padding: 8px; border-radius: 12px; border: 1px solid var(--border); gap: 12px; }
-        .thumb img { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; }
-        .btn-del { background: #fee2e2; color: #ef4444; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; margin-left: auto; }
-        .btn-main { width: 100%; background: var(--blue); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; }
+        .thumb { display: flex; align-items: center; background: white; padding: 10px; border-radius: 12px; border: 1px solid var(--border); gap: 12px; }
+        .thumb img { width: 55px; height: 55px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
+        .controls { display: flex; gap: 5px; margin-left: auto; }
+        .btn-ctrl { padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
+        .btn-move { background: #f1f5f9; color: var(--blue); }
+        .btn-del { background: #fee2e2; color: #ef4444; }
+        .btn-main { width: 100%; background: var(--blue); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
         #status { text-align: center; margin-top: 12px; font-size: 0.85rem; font-weight: 600; color: var(--blue); }
         footer { text-align: center; padding: 40px 20px; font-size: 0.8rem; color: #94a3b8; border-top: 1px solid var(--border); }
+        .footer-links { margin-top: 10px; }
         .footer-links a { color: var(--blue); text-decoration: none; margin: 0 8px; font-weight: 600; }
         .modal { display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; padding: 20px; overflow-y: auto; }
-        .modal-content { background:white; padding:25px; border-radius:15px; max-width:500px; margin: 40px auto; position:relative; }
+        .modal-content { background:white; padding:25px; border-radius:15px; max-width:550px; margin: 40px auto; position:relative; text-align: left; }
     </style>
 </head>
 <body>
@@ -44,59 +50,59 @@
 
 <div class="container">
     <div class="card">
-        <span class="card-title">1. Document Details</span>
+        <span class="card-title">1. Header Information</span>
         <label class="toggle-box" for="useHeader">
             <input type="checkbox" id="useHeader" checked>
-            <span>Add Academic Header to Page 1</span>
+            <span>Add Professional Header (Page 1)</span>
         </label>
         <div id="headerFields">
-            <label>Student Full Name</label>
-            <input type="text" id="name" placeholder="John Doe">
-            <label>Assignment Title</label>
-            <input type="text" id="subject" placeholder="Biology Lab Report 01">
+            <label>Full Name</label>
+            <input type="text" id="name" placeholder="Enter student name">
+            <label>Assignment / Subject Title</label>
+            <input type="text" id="subject" placeholder="e.g., Microbiology Quiz 02">
         </div>
     </div>
 
     <div class="card">
-        <span class="card-title">2. Upload Assignment Photos</span>
+        <span class="card-title">2. Select Images</span>
         <label class="upload-area" for="fileIn">
-            <strong style="color:var(--blue)">+ Tap to Add Images</strong>
-            <p>Multiple selection supported</p>
+            <strong style="color:var(--blue)">+ Add Assignment Photos</strong>
+            <p>You can select multiple images at once</p>
             <input type="file" id="fileIn" accept="image/*" multiple hidden>
         </label>
         <div class="gallery" id="gallery"></div>
     </div>
 
-    <button class="btn-main" onclick="generatePDF()">Generate Professional PDF</button>
+    <button class="btn-main" onclick="generatePDF()">Generate Academic PDF</button>
     <div id="status">System Ready</div>
 </div>
 
 <div class="container">
     <div class="card" style="color: #475569; font-size: 0.95rem;">
-        <h2 style="color: var(--dark); font-size: 1.2rem;">Why Use StudentScan Pro?</h2>
-        <p>StudentScan Pro is built for academic integrity. We help students turn photos into professional PDFs instantly without any data leaving their devices.</p>
-        <h3 style="color: var(--blue); font-size: 1rem;">Key Features:</h3>
+        <h2 style="color: var(--dark); font-size: 1.2rem;">Professional PDF Formatting for Students</h2>
+        <p>StudentScan Pro is designed to bridge the gap between physical notes and digital submissions. Our tool ensures your assignments look professional without the need for expensive scanning equipment.</p>
+        <h3 style="color: var(--blue); font-size: 1rem;">Key Benefits:</h3>
         <ul>
-            <li><strong>Privacy First:</strong> Local browser-based processing.</li>
-            <li><strong>Academic Headers:</strong> Pre-formatted student details.</li>
-            <li><strong>Optimized Size:</strong> Perfect for LMS uploads.</li>
+            <li><strong>Offline Security:</strong> No data is uploaded; your privacy is guaranteed.</li>
+            <li><strong>Optimized Files:</strong> Higher quality with lower file sizes.</li>
+            <li><strong>Standard Formatting:</strong> Built-in support for academic headers.</li>
         </ul>
     </div>
 </div>
 
 <footer>
-    <p>&copy; 2025 StudentScan Pro.</p>
+    <p>&copy; 2025 StudentScan Pro. Academic Utility Suite.</p>
     <div class="footer-links">
-        <a href="#" onclick="openLegal('about')">About</a>
-        <a href="#" onclick="openLegal('privacy')">Privacy</a>
-        <a href="#" onclick="openLegal('terms')">Terms</a>
-        <a href="#" onclick="openLegal('contact')">Contact</a>
+        <a href="javascript:void(0)" onclick="openLegal('about')">About Us</a> |
+        <a href="javascript:void(0)" onclick="openLegal('privacy')">Privacy Policy</a> |
+        <a href="javascript:void(0)" onclick="openLegal('terms')">Terms</a> |
+        <a href="javascript:void(0)" onclick="openLegal('contact')">Contact Us</a>
     </div>
 </footer>
 
 <div id="legalModal" class="modal">
     <div class="modal-content">
-        <span style="position:absolute; right:15px; top:10px; cursor:pointer; font-size:24px;" onclick="closeLegal()">&times;</span>
+        <span style="position:absolute; right:15px; top:10px; cursor:pointer; font-size:28px; color:#999;" onclick="closeLegal()">&times;</span>
         <div id="legalContent"></div>
     </div>
 </div>
@@ -109,7 +115,11 @@
         const selected = Array.from(e.target.files);
         selected.forEach(file => {
             if (file.type.startsWith('image/')) {
-                filesArray.push({ id: Date.now()+Math.random(), data: file, url: URL.createObjectURL(file) });
+                filesArray.push({ 
+                    id: Date.now()+Math.random(), 
+                    data: file, 
+                    url: URL.createObjectURL(file) 
+                });
             }
         });
         updateUI();
@@ -122,10 +132,26 @@
         filesArray.forEach((f, i) => {
             const div = document.createElement('div');
             div.className = 'thumb';
-            div.innerHTML = `<img src="${f.url}"> <div style="flex:1; font-weight:600;">Page ${i+1}</div> <button class="btn-del" onclick="remove(${i})">Remove</button>`;
+            div.innerHTML = `
+                <img src="${f.url}">
+                <div style="flex:1; font-weight:600; font-size:0.9rem; color:#64748b;">Page ${i+1}</div>
+                <div class="controls">
+                    <button class="btn-ctrl btn-move" onclick="move(${i}, -1)">↑</button>
+                    <button class="btn-ctrl btn-move" onclick="move(${i}, 1)">↓</button>
+                    <button class="btn-ctrl btn-del" onclick="remove(${i})">×</button>
+                </div>
+            `;
             gall.appendChild(div);
         });
-        status.innerText = filesArray.length > 0 ? `${filesArray.length} images loaded` : "Ready";
+        status.innerText = filesArray.length > 0 ? `${filesArray.length} images ready` : "Ready";
+    }
+
+    function move(index, dir) {
+        const newPos = index + dir;
+        if (newPos >= 0 && newPos < filesArray.length) {
+            [filesArray[index], filesArray[newPos]] = [filesArray[newPos], filesArray[index]];
+            updateUI();
+        }
     }
 
     function remove(i) {
@@ -134,10 +160,10 @@
     }
 
     async function generatePDF() {
-        if (filesArray.length === 0) return alert("Please add some images first.");
+        if (filesArray.length === 0) return alert("Please select images!");
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-        status.innerText = "Processing PDF...";
+        status.innerText = "Compressing & generating...";
         
         try {
             for (let i = 0; i < filesArray.length; i++) {
@@ -151,7 +177,7 @@
                         canvas.height = img.height * scale;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.7));
+                        resolve(canvas.toDataURL('image/jpeg', 0.75));
                     };
                     img.src = filesArray[i].url;
                 });
@@ -159,41 +185,46 @@
                 let y = 10;
                 if (i === 0 && document.getElementById('useHeader').checked) {
                     doc.setFillColor(37, 99, 235);
-                    doc.rect(0, 0, 210, 40, 'F');
+                    doc.rect(0, 0, 210, 42, 'F');
                     doc.setTextColor(255, 255, 255);
                     doc.setFontSize(18);
-                    doc.text(document.getElementById('subject').value.toUpperCase() || "ASSIGNMENT", 15, 18);
+                    doc.text(document.getElementById('subject').value.toUpperCase() || "ACADEMIC DOCUMENT", 15, 18);
                     doc.setFontSize(10);
-                    doc.text(`STUDENT: ${document.getElementById('name').value.toUpperCase() || "USER"}`, 15, 30);
+                    doc.text(`NAME: ${document.getElementById('name').value.toUpperCase() || "STUDENT"}`, 15, 30);
+                    doc.text(`DATE: ${new Date().toLocaleDateString()}`, 15, 36);
                     y = 50;
                 }
                 const props = doc.getImageProperties(imgData);
                 const w = 180;
                 const h = (props.height * w) / props.width;
-                doc.addImage(imgData, 'JPEG', 15, y, w, Math.min(h, 270 - y));
+                doc.addImage(imgData, 'JPEG', 15, y, w, Math.min(h, 280 - y));
+                
+                doc.setTextColor(150);
+                doc.setFontSize(8);
+                doc.text(`Page ${i+1} of ${filesArray.length} | StudentScan Pro`, 105, 290, {align: 'center'});
             }
-            doc.save(`StudentScan.pdf`);
-            status.innerText = "Success!";
+            doc.save(`StudentScan_${Date.now()}.pdf`);
+            status.innerText = "Downloaded Successfully!";
         } catch (e) {
-            status.innerText = "Error. Try fewer images.";
+            status.innerText = "Error. Try with fewer images.";
         }
     }
 
     const legalData = {
-        about: "<h2>About</h2><p>StudentScan Pro is a free academic utility.</p>",
-        privacy: "<h2>Privacy</h2><p>Images stay on your device.</p>",
-        terms: "<h2>Terms</h2><p>Use for academic purposes.</p>",
-        contact: "<h2>Contact</h2><p>shahrozali.lap@gmail.com</p>"
+        about: `<h2>About StudentScan Pro</h2><p>StudentScan Pro is a high-utility academic tool designed for students worldwide. We help bridge the gap between handwritten notes and professional academic submissions. Our mission is to provide a fast, secure, and easy-to-use platform that automates the formatting of multi-page PDF documents with professional headers, ensuring students can focus on their learning rather than formatting.</p>`,
+        privacy: `<h2>Privacy Policy</h2><p>Your privacy is our absolute priority. StudentScan Pro operates entirely within your browser.</p><ul><li><strong>No Image Storage:</strong> Images are processed locally and never uploaded to any server.</li><li><strong>Data Security:</strong> We do not track or store personal data.</li><li><strong>Cookies:</strong> We use Google AdSense which may use cookies to serve relevant ads.</li></ul>`,
+        terms: `<h2>Terms of Service</h2><p>By using StudentScan Pro, you agree to use this tool for lawful academic purposes. We provide this service "as is" and are not responsible for formatting errors or data loss. Users must ensure they have the rights to any content they convert.</p>`,
+        contact: `<h2>Contact Us</h2><p>We are always looking to improve! If you have suggestions, bug reports, or partnership inquiries, please reach out.</p><p style="background: #f1f5f9; padding: 15px; border-left: 4px solid #2563eb;"><strong>Official Email:</strong> shahrozali.lap@gmail.com</p>`
     };
 
     function openLegal(id) {
         document.getElementById('legalContent').innerHTML = legalData[id];
         document.getElementById('legalModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
     }
-    function closeLegal() { document.getElementById('legalModal').style.display = 'none'; }
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
+    function closeLegal() { 
+        document.getElementById('legalModal').style.display = 'none'; 
+        document.body.style.overflow = 'auto';
     }
 </script>
 </body>
