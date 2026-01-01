@@ -80,13 +80,7 @@
 <div class="container">
     <div class="card" style="color: #475569; font-size: 0.95rem;">
         <h2 style="color: var(--dark); font-size: 1.2rem;">Professional PDF Formatting for Students</h2>
-        <p>StudentScan Pro is designed to bridge the gap between physical notes and digital submissions. Our tool ensures your assignments look professional without the need for expensive scanning equipment.</p>
-        <h3 style="color: var(--blue); font-size: 1rem;">Key Benefits:</h3>
-        <ul>
-            <li><strong>Offline Security:</strong> No data is uploaded; your privacy is guaranteed.</li>
-            <li><strong>Optimized Files:</strong> Higher quality with lower file sizes.</li>
-            <li><strong>Standard Formatting:</strong> Built-in support for academic headers.</li>
-        </ul>
+        <p>StudentScan Pro ensures your assignments look professional without the need for scanning equipment.</p>
     </div>
 </div>
 
@@ -102,4 +96,133 @@
 
 <div id="legalModal" class="modal">
     <div class="modal-content">
-        <span style="position:absolute; right:15px; top:10px; cursor:pointer; font-size
+        <span style="position:absolute; right:15px; top:10px; cursor:pointer; font-size:28px; color:#999;" onclick="closeLegal()">&times;</span>
+        <div id="legalContent"></div>
+    </div>
+</div>
+
+<script>
+    let filesArray = [];
+    const status = document.getElementById('status');
+
+    document.getElementById('fileIn').addEventListener('change', function(e) {
+        const selected = Array.from(e.target.files);
+        selected.forEach(file => {
+            if (file.type.startsWith('image/')) {
+                filesArray.push({ 
+                    id: Date.now()+Math.random(), 
+                    data: file, 
+                    url: URL.createObjectURL(file) 
+                });
+            }
+        });
+        updateUI();
+        this.value = ''; 
+    });
+
+    function updateUI() {
+        const gall = document.getElementById('gallery');
+        gall.innerHTML = '';
+        filesArray.forEach((f, i) => {
+            const div = document.createElement('div');
+            div.className = 'thumb';
+            div.innerHTML = `
+                <img src="${f.url}">
+                <div style="flex:1; font-weight:600; font-size:0.9rem; color:#64748b;">Page ${i+1}</div>
+                <div class="controls">
+                    <button class="btn-ctrl btn-move" onclick="move(${i}, -1)">↑</button>
+                    <button class="btn-ctrl btn-move" onclick="move(${i}, 1)">↓</button>
+                    <button class="btn-ctrl btn-del" onclick="remove(${i})">×</button>
+                </div>
+            `;
+            gall.appendChild(div);
+        });
+        status.innerText = filesArray.length > 0 ? `${filesArray.length} images ready` : "Ready";
+    }
+
+    function move(index, dir) {
+        const newPos = index + dir;
+        if (newPos >= 0 && newPos < filesArray.length) {
+            [filesArray[index], filesArray[newPos]] = [filesArray[newPos], filesArray[index]];
+            updateUI();
+        }
+    }
+
+    function remove(i) {
+        filesArray.splice(i, 1);
+        updateUI();
+    }
+
+    async function generatePDF() {
+        if (filesArray.length === 0) return alert("Please select images!");
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        status.innerText = "Processing...";
+        
+        try {
+            for (let i = 0; i < filesArray.length; i++) {
+                if (i > 0) doc.addPage();
+                
+                const imgData = await new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const scale = Math.min(1, 1200 / img.width);
+                        canvas.width = img.width * scale;
+                        canvas.height = img.height * scale;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.75));
+                    };
+                    img.src = filesArray[i].url;
+                });
+
+                let y = 10;
+                if (i === 0 && document.getElementById('useHeader').checked) {
+                    doc.setFillColor(37, 99, 235);
+                    doc.rect(0, 0, 210, 42, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(18);
+                    doc.text(document.getElementById('subject').value.toUpperCase() || "MICRO ASSIGNMENT", 15, 18); [cite: 1]
+                    doc.setFontSize(10);
+                    doc.text(`NAME: ${document.getElementById('name').value.toUpperCase() || "SHAHROZ ALI 66232"}`, 15, 30); [cite: 2]
+                    doc.text(`DATE: ${new Date().toLocaleDateString()}`, 15, 36); [cite: 3]
+                    y = 50;
+                }
+
+                const props = doc.getImageProperties(imgData);
+                const w = 180;
+                const h = (props.height * w) / props.width;
+                doc.addImage(imgData, 'JPEG', 15, y, w, Math.min(h, 220));
+
+                // FIXED FOOTER PLACEMENT
+                doc.setTextColor(100, 100, 100);
+                doc.setFontSize(10);
+                const footerInfo = `Student: ${document.getElementById('name').value.toUpperCase() || "SHAHROZ ALI 66232"} StudentScan Pro`; [cite: 37, 42]
+                doc.text(footerInfo, 105, 285, {align: 'center'}); [cite: 42]
+                
+                doc.setFontSize(9);
+                doc.text(`Page ${i+1} of ${filesArray.length}`, 105, 292, {align: 'center'}); [cite: 41, 43]
+            }
+            doc.save(`StudentScan_${Date.now()}.pdf`);
+            status.innerText = "Done!";
+        } catch (e) {
+            status.innerText = "Error - try again.";
+        }
+    }
+
+    const legalData = {
+        about: `<h2>About Us</h2><p>StudentScan Pro helps students format multi-page PDF documents easily.</p>`,
+        privacy: `<h2>Privacy</h2><p>Images are processed locally and never uploaded to any server.</p>`,
+        terms: `<h2>Terms</h2><p>Use for lawful academic purposes only.</p>`,
+        contact: `<h2>Contact</h2><p>Email: shahrozali.lap@gmail.com</p>`
+    };
+
+    function openLegal(id) {
+        document.getElementById('legalContent').innerHTML = legalData[id];
+        document.getElementById('legalModal').style.display = 'block';
+    }
+    function closeLegal() { document.getElementById('legalModal').style.display = 'none'; }
+</script>
+</body>
+</html>
