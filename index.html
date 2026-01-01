@@ -182,7 +182,7 @@
                     img.src = filesArray[i].url;
                 });
 
-                let yStart = 10;
+                let y = 10;
                 if (i === 0 && document.getElementById('useHeader').checked) {
                     doc.setFillColor(37, 99, 235);
                     doc.rect(0, 0, 210, 42, 'F');
@@ -192,32 +192,20 @@
                     doc.setFontSize(10);
                     doc.text(`NAME: ${document.getElementById('name').value.toUpperCase() || "STUDENT"}`, 15, 30);
                     doc.text(`DATE: ${new Date().toLocaleDateString()}`, 15, 36);
-                    yStart = 50;
+                    y = 50;
                 }
-                
                 const props = doc.getImageProperties(imgData);
                 const w = 180;
                 const h = (props.height * w) / props.width;
-                // Constraints: 15mm left, yStart top, 180mm wide, max 230mm height to leave room for footer
-                doc.addImage(imgData, 'JPEG', 15, yStart, w, Math.min(h, 230));
+                doc.addImage(imgData, 'JPEG', 15, y, w, Math.min(h, 280 - y));
                 
-                // FOOTER LOGIC:
-                doc.setTextColor(150, 150, 150);
-                doc.setFontSize(9);
-                
-                // Left side: Student Name | StudentScan Pro
-                const studentName = document.getElementById('name').value || "STUDENT";
-                doc.text(`${studentName} | StudentScan Pro`, 15, 285);
-                
-                // Right side: Page X of Y
-                const pageText = `Page ${i + 1} of ${filesArray.length}`;
-                const pageWidth = doc.internal.pageSize.getWidth();
-                doc.text(pageText, pageWidth - 15, 285, { align: 'right' });
+                doc.setTextColor(150);
+                doc.setFontSize(8);
+                doc.text(`Page ${i+1} of ${filesArray.length} | StudentScan Pro`, 105, 290, {align: 'center'});
             }
             doc.save(`StudentScan_${Date.now()}.pdf`);
             status.innerText = "Downloaded Successfully!";
         } catch (e) {
-            console.error(e);
             status.innerText = "Error. Try with fewer images.";
         }
     }
