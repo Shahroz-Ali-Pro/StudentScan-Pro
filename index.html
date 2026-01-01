@@ -1,231 +1,243 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudentScan Pro | Academic Image to PDF Suite</title>
-    <meta name="description" content="The ultimate student tool. Convert assignment photos to professional PDFs with academic headers. Works offline and secure.">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon.png">
-    <link rel="icon" type="image/png" href="icon.png">
-    <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudentScan Pro | Academic Image to PDF Suite</title>
+    <meta name="description" content="The ultimate student tool. Convert assignment photos to professional PDFs with academic headers. Works offline and secure.">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="manifest" href="manifest.json">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
-    <style>
-        :root { --blue: #2563eb; --blue-dark: #1e40af; --dark: #0f172a; --gray: #f8fafc; --border: #e2e8f0; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f1f5f9; margin: 0; color: var(--dark); line-height: 1.5; }
-        nav { background: white; padding: 1rem 5%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        h1.logo { margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--blue); letter-spacing: -0.5px; }
-        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
-        .card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; border: 1px solid var(--border); }
-        .card-title { font-size: 0.9rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 15px; display: block; }
-        label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: #475569; }
-        input[type="text"] { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 1rem; margin-bottom: 15px; }
-        .toggle-box { display: flex; align-items: center; gap: 10px; background: var(--gray); padding: 12px; border-radius: 10px; margin-bottom: 15px; cursor: pointer; }
-        .upload-area { display: block; border: 2px dashed #cbd5e1; padding: 30px 20px; text-align: center; border-radius: 12px; cursor: pointer; background: var(--gray); transition: 0.3s; }
-        .upload-area:hover { border-color: var(--blue); background: #eff6ff; }
-        .gallery { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .thumb { display: flex; align-items: center; background: white; padding: 10px; border-radius: 12px; border: 1px solid var(--border); gap: 12px; }
-        .thumb img { width: 55px; height: 55px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
-        .controls { display: flex; gap: 5px; margin-left: auto; }
-        .btn-ctrl { padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
-        .btn-move { background: #f1f5f9; color: var(--blue); }
-        .btn-del { background: #fee2e2; color: #ef4444; }
-        .btn-main { width: 100%; background: var(--blue); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
-        #status { text-align: center; margin-top: 12px; font-size: 0.85rem; font-weight: 600; color: var(--blue); }
-        footer { text-align: center; padding: 40px 20px; font-size: 0.8rem; color: #94a3b8; border-top: 1px solid var(--border); }
-        .footer-links { margin-top: 10px; }
-        .footer-links a { color: var(--blue); text-decoration: none; margin: 0 8px; font-weight: 600; }
-        .modal { display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; padding: 20px; overflow-y: auto; }
-        .modal-content { background:white; padding:25px; border-radius:15px; max-width:550px; margin: 40px auto; position:relative; text-align: left; }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <style>
+        :root { --blue: #2563eb; --blue-dark: #1e40af; --dark: #0f172a; --gray: #f8fafc; --border: #e2e8f0; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f1f5f9; margin: 0; color: var(--dark); line-height: 1.5; }
+        nav { background: white; padding: 1rem 5%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        h1.logo { margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--blue); letter-spacing: -0.5px; }
+        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+        .card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; border: 1px solid var(--border); }
+        .card-title { font-size: 0.9rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 15px; display: block; }
+        label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: #475569; }
+        input[type="text"] { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 1rem; margin-bottom: 15px; }
+        .toggle-box { display: flex; align-items: center; gap: 10px; background: var(--gray); padding: 12px; border-radius: 10px; margin-bottom: 15px; cursor: pointer; }
+        .upload-area { display: block; border: 2px dashed #cbd5e1; padding: 30px 20px; text-align: center; border-radius: 12px; cursor: pointer; background: var(--gray); transition: 0.3s; }
+        .upload-area:hover { border-color: var(--blue); background: #eff6ff; }
+        .gallery { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .thumb { display: flex; align-items: center; background: white; padding: 10px; border-radius: 12px; border: 1px solid var(--border); gap: 12px; }
+        .thumb img { width: 55px; height: 55px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
+        .controls { display: flex; gap: 5px; margin-left: auto; }
+        .btn-ctrl { padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
+        .btn-move { background: #f1f5f9; color: var(--blue); }
+        .btn-del { background: #fee2e2; color: #ef4444; }
+        .btn-main { width: 100%; background: var(--blue); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+        #status { text-align: center; margin-top: 12px; font-size: 0.85rem; font-weight: 600; color: var(--blue); }
+        footer { text-align: center; padding: 40px 20px; font-size: 0.8rem; color: #94a3b8; border-top: 1px solid var(--border); }
+        .footer-links { margin-top: 10px; }
+        .footer-links a { color: var(--blue); text-decoration: none; margin: 0 8px; font-weight: 600; }
+        .modal { display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; padding: 20px; overflow-y: auto; }
+        .modal-content { background:white; padding:25px; border-radius:15px; max-width:550px; margin: 40px auto; position:relative; text-align: left; }
+    </style>
 </head>
 <body>
 
 <nav><h1 class="logo">STUDENTSCAN PRO</h1></nav>
 
 <div class="container">
-    <div class="card">
-        <span class="card-title">1. Header Information</span>
-        <label class="toggle-box" for="useHeader">
-            <input type="checkbox" id="useHeader" checked>
-            <span>Add Professional Header (Page 1)</span>
-        </label>
-        <div id="headerFields">
-            <label>Full Name</label>
-            <input type="text" id="name" placeholder="Enter student name">
-            <label>Assignment / Subject Title</label>
-            <input type="text" id="subject" placeholder="e.g., Microbiology Quiz 02">
-        </div>
-    </div>
+    <div class="card">
+        <span class="card-title">1. Header Information</span>
+        <label class="toggle-box" for="useHeader">
+            <input type="checkbox" id="useHeader" checked>
+            <span>Add Professional Header (Page 1)</span>
+        </label>
+        <div id="headerFields">
+            <label>Full Name</label>
+            <input type="text" id="name" placeholder="Enter student name">
+            <label>Assignment / Subject Title</label>
+            <input type="text" id="subject" placeholder="e.g., Microbiology Quiz 02">
+        </div>
+    </div>
 
-    <div class="card">
-        <span class="card-title">2. Select Images</span>
-        <label class="upload-area" for="fileIn">
-            <strong style="color:var(--blue)">+ Add Assignment Photos</strong>
-            <p>You can select multiple images at once</p>
-            <input type="file" id="fileIn" accept="image/*" multiple hidden>
-        </label>
-        <div class="gallery" id="gallery"></div>
-    </div>
+    <div class="card">
+        <span class="card-title">2. Select Images</span>
+        <label class="upload-area" for="fileIn">
+            <strong style="color:var(--blue)">+ Add Assignment Photos</strong>
+            <p>You can select multiple images at once</p>
+            <input type="file" id="fileIn" accept="image/*" multiple hidden>
+        </label>
+        <div class="gallery" id="gallery"></div>
+    </div>
 
-    <button class="btn-main" onclick="generatePDF()">Generate Academic PDF</button>
-    <div id="status">System Ready</div>
+    <button class="btn-main" onclick="generatePDF()">Generate Academic PDF</button>
+    <div id="status">System Ready</div>
 </div>
 
 <div class="container">
-    <div class="card" style="color: #475569; font-size: 0.95rem;">
-        <h2 style="color: var(--dark); font-size: 1.2rem;">Professional PDF Formatting for Students</h2>
-        <p>StudentScan Pro is designed to bridge the gap between physical notes and digital submissions. Our tool ensures your assignments look professional without the need for expensive scanning equipment.</p>
-        <h3 style="color: var(--blue); font-size: 1rem;">Key Benefits:</h3>
-        <ul>
-            <li><strong>Offline Security:</strong> No data is uploaded; your privacy is guaranteed.</li>
-            <li><strong>Optimized Files:</strong> Higher quality with lower file sizes.</li>
-            <li><strong>Standard Formatting:</strong> Built-in support for academic headers.</li>
-        </ul>
-    </div>
+    <div class="card" style="color: #475569; font-size: 0.95rem;">
+        <h2 style="color: var(--dark); font-size: 1.2rem;">Professional PDF Formatting for Students</h2>
+        <p>StudentScan Pro is designed to bridge the gap between physical notes and digital submissions. Our tool ensures your assignments look professional without the need for expensive scanning equipment.</p>
+        <h3 style="color: var(--blue); font-size: 1rem;">Key Benefits:</h3>
+        <ul>
+            <li><strong>Offline Security:</strong> No data is uploaded; your privacy is guaranteed.</li>
+            <li><strong>Optimized Files:</strong> Higher quality with lower file sizes.</li>
+            <li><strong>Standard Formatting:</strong> Built-in support for academic headers.</li>
+        </ul>
+    </div>
 </div>
 
 <footer>
-    <p>&copy; 2025 StudentScan Pro. Academic Utility Suite.</p>
-    <div class="footer-links">
-        <a href="javascript:void(0)" onclick="openLegal('about')">About Us</a> |
-        <a href="javascript:void(0)" onclick="openLegal('privacy')">Privacy Policy</a> |
-        <a href="javascript:void(0)" onclick="openLegal('terms')">Terms</a> |
-        <a href="javascript:void(0)" onclick="openLegal('contact')">Contact Us</a>
-    </div>
+    <p>&copy; 2025 StudentScan Pro. Academic Utility Suite.</p>
+    <div class="footer-links">
+        <a href="javascript:void(0)" onclick="openLegal('about')">About Us</a> |
+        <a href="javascript:void(0)" onclick="openLegal('privacy')">Privacy Policy</a> |
+        <a href="javascript:void(0)" onclick="openLegal('terms')">Terms</a> |
+        <a href="javascript:void(0)" onclick="openLegal('contact')">Contact Us</a>
+    </div>
 </footer>
 
 <div id="legalModal" class="modal">
-    <div class="modal-content">
-        <span style="position:absolute; right:15px; top:10px; cursor:pointer; font-size:28px; color:#999;" onclick="closeLegal()">&times;</span>
-        <div id="legalContent"></div>
-    </div>
+    <div class="modal-content">
+        <span style="position:absolute; right:15px; top:10px; cursor:pointer; font-size:28px; color:#999;" onclick="closeLegal()">&times;</span>
+        <div id="legalContent"></div>
+    </div>
 </div>
 
 <script>
-    let filesArray = [];
-    const status = document.getElementById('status');
+    let filesArray = [];
+    const status = document.getElementById('status');
 
-    document.getElementById('fileIn').addEventListener('change', function(e) {
-        const selected = Array.from(e.target.files);
-        selected.forEach(file => {
-            if (file.type.startsWith('image/')) {
-                filesArray.push({ 
-                    id: Date.now()+Math.random(), 
-                    data: file, 
-                    url: URL.createObjectURL(file) 
-                });
-            }
-        });
-        updateUI();
-        this.value = ''; 
-    });
+    document.getElementById('fileIn').addEventListener('change', function(e) {
+        const selected = Array.from(e.target.files);
+        selected.forEach(file => {
+            if (file.type.startsWith('image/')) {
+                filesArray.push({ 
+                    id: Date.now()+Math.random(), 
+                    data: file, 
+                    url: URL.createObjectURL(file) 
+                });
+            }
+        });
+        updateUI();
+        this.value = ''; 
+    });
 
-    function updateUI() {
-        const gall = document.getElementById('gallery');
-        gall.innerHTML = '';
-        filesArray.forEach((f, i) => {
-            const div = document.createElement('div');
-            div.className = 'thumb';
-            div.innerHTML = `
-                <img src="${f.url}">
-                <div style="flex:1; font-weight:600; font-size:0.9rem; color:#64748b;">Page ${i+1}</div>
-                <div class="controls">
-                    <button class="btn-ctrl btn-move" onclick="move(${i}, -1)">↑</button>
-                    <button class="btn-ctrl btn-move" onclick="move(${i}, 1)">↓</button>
-                    <button class="btn-ctrl btn-del" onclick="remove(${i})">×</button>
-                </div>
-            `;
-            gall.appendChild(div);
-        });
-        status.innerText = filesArray.length > 0 ? `${filesArray.length} images ready` : "Ready";
-    }
+    function updateUI() {
+        const gall = document.getElementById('gallery');
+        gall.innerHTML = '';
+        filesArray.forEach((f, i) => {
+            const div = document.createElement('div');
+            div.className = 'thumb';
+            div.innerHTML = `
+                <img src="${f.url}">
+                <div style="flex:1; font-weight:600; font-size:0.9rem; color:#64748b;">Page ${i+1}</div>
+                <div class="controls">
+                    <button class="btn-ctrl btn-move" onclick="move(${i}, -1)">↑</button>
+                    <button class="btn-ctrl btn-move" onclick="move(${i}, 1)">↓</button>
+                    <button class="btn-ctrl btn-del" onclick="remove(${i})">×</button>
+                </div>
+            `;
+            gall.appendChild(div);
+        });
+        status.innerText = filesArray.length > 0 ? `${filesArray.length} images ready` : "Ready";
+    }
 
-    function move(index, dir) {
-        const newPos = index + dir;
-        if (newPos >= 0 && newPos < filesArray.length) {
-            [filesArray[index], filesArray[newPos]] = [filesArray[newPos], filesArray[index]];
-            updateUI();
-        }
-    }
+    function move(index, dir) {
+        const newPos = index + dir;
+        if (newPos >= 0 && newPos < filesArray.length) {
+            [filesArray[index], filesArray[newPos]] = [filesArray[newPos], filesArray[index]];
+            updateUI();
+        }
+    }
 
-    function remove(i) {
-        filesArray.splice(i, 1);
-        updateUI();
-    }
+    function remove(i) {
+        filesArray.splice(i, 1);
+        updateUI();
+    }
 
-    async function generatePDF() {
-        if (filesArray.length === 0) return alert("Please select images!");
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        status.innerText = "Compressing & generating...";
-        
-        try {
-            for (let i = 0; i < filesArray.length; i++) {
-                if (i > 0) doc.addPage();
-                const imgData = await new Promise(resolve => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const scale = Math.min(1, 1200 / img.width);
-                        canvas.width = img.width * scale;
-                        canvas.height = img.height * scale;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.75));
-                    };
-                    img.src = filesArray[i].url;
-                });
+    async function generatePDF() {
+        if (filesArray.length === 0) return alert("Please select images!");
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        status.innerText = "Compressing & generating...";
+        
+        try {
+            for (let i = 0; i < filesArray.length; i++) {
+                if (i > 0) doc.addPage();
+                const imgData = await new Promise(resolve => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const scale = Math.min(1, 1200 / img.width);
+                        canvas.width = img.width * scale;
+                        canvas.height = img.height * scale;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.75));
+                    };
+                    img.src = filesArray[i].url;
+                });
 
-                let y = 10;
-                if (i === 0 && document.getElementById('useHeader').checked) {
-                    doc.setFillColor(37, 99, 235);
-                    doc.rect(0, 0, 210, 42, 'F');
-                    doc.setTextColor(255, 255, 255);
-                    doc.setFontSize(18);
-                    doc.text(document.getElementById('subject').value.toUpperCase() || "ACADEMIC DOCUMENT", 15, 18);
-                    doc.setFontSize(10);
-                    doc.text(`NAME: ${document.getElementById('name').value.toUpperCase() || "STUDENT"}`, 15, 30);
-                    doc.text(`DATE: ${new Date().toLocaleDateString()}`, 15, 36);
-                    y = 50;
-                }
-                const props = doc.getImageProperties(imgData);
-                const w = 180;
-                const h = (props.height * w) / props.width;
-                doc.addImage(imgData, 'JPEG', 15, y, w, Math.min(h, 280 - y));
-                
-                doc.setTextColor(150);
-                doc.setFontSize(8);
-                doc.text(`Page ${i+1} of ${filesArray.length} | StudentScan Pro`, 105, 290, {align: 'center'});
-            }
-            doc.save(`StudentScan_${Date.now()}.pdf`);
-            status.innerText = "Downloaded Successfully!";
-        } catch (e) {
-            status.innerText = "Error. Try with fewer images.";
-        }
-    }
+                let yStart = 10;
+                if (i === 0 && document.getElementById('useHeader').checked) {
+                    doc.setFillColor(37, 99, 235);
+                    doc.rect(0, 0, 210, 42, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFontSize(18);
+                    doc.text(document.getElementById('subject').value.toUpperCase() || "ACADEMIC DOCUMENT", 15, 18);
+                    doc.setFontSize(10);
+                    doc.text(`NAME: ${document.getElementById('name').value.toUpperCase() || "STUDENT"}`, 15, 30);
+                    doc.text(`DATE: ${new Date().toLocaleDateString()}`, 15, 36);
+                    yStart = 50;
+                }
+                
+                const props = doc.getImageProperties(imgData);
+                const w = 180;
+                const h = (props.height * w) / props.width;
+                // Constraints: 15mm left, yStart top, 180mm wide, max 230mm height to leave room for footer
+                doc.addImage(imgData, 'JPEG', 15, yStart, w, Math.min(h, 230));
+                
+                // FOOTER LOGIC:
+                doc.setTextColor(150, 150, 150);
+                doc.setFontSize(9);
+                
+                // Left side: Student Name | StudentScan Pro
+                const studentName = document.getElementById('name').value || "STUDENT";
+                doc.text(`${studentName} | StudentScan Pro`, 15, 285);
+                
+                // Right side: Page X of Y
+                const pageText = `Page ${i + 1} of ${filesArray.length}`;
+                const pageWidth = doc.internal.pageSize.getWidth();
+                doc.text(pageText, pageWidth - 15, 285, { align: 'right' });
+            }
+            doc.save(`StudentScan_${Date.now()}.pdf`);
+            status.innerText = "Downloaded Successfully!";
+        } catch (e) {
+            console.error(e);
+            status.innerText = "Error. Try with fewer images.";
+        }
+    }
 
-    const legalData = {
-        about: `<h2>About StudentScan Pro</h2><p>StudentScan Pro is a high-utility academic tool designed for students worldwide. We help bridge the gap between handwritten notes and professional academic submissions. Our mission is to provide a fast, secure, and easy-to-use platform that automates the formatting of multi-page PDF documents with professional headers, ensuring students can focus on their learning rather than formatting.</p>`,
-        privacy: `<h2>Privacy Policy</h2><p>Your privacy is our absolute priority. StudentScan Pro operates entirely within your browser.</p><ul><li><strong>No Image Storage:</strong> Images are processed locally and never uploaded to any server.</li><li><strong>Data Security:</strong> We do not track or store personal data.</li><li><strong>Cookies:</strong> We use Google AdSense which may use cookies to serve relevant ads.</li></ul>`,
-        terms: `<h2>Terms of Service</h2><p>By using StudentScan Pro, you agree to use this tool for lawful academic purposes. We provide this service "as is" and are not responsible for formatting errors or data loss. Users must ensure they have the rights to any content they convert.</p>`,
-        contact: `<h2>Contact Us</h2><p>We are always looking to improve! If you have suggestions, bug reports, or partnership inquiries, please reach out.</p><p style="background: #f1f5f9; padding: 15px; border-left: 4px solid #2563eb;"><strong>Official Email:</strong> shahrozali.lap@gmail.com</p>`
-    };
+    const legalData = {
+        about: `<h2>About StudentScan Pro</h2><p>StudentScan Pro is a high-utility academic tool designed for students worldwide. We help bridge the gap between handwritten notes and professional academic submissions. Our mission is to provide a fast, secure, and easy-to-use platform that automates the formatting of multi-page PDF documents with professional headers, ensuring students can focus on their learning rather than formatting.</p>`,
+        privacy: `<h2>Privacy Policy</h2><p>Your privacy is our absolute priority. StudentScan Pro operates entirely within your browser.</p><ul><li><strong>No Image Storage:</strong> Images are processed locally and never uploaded to any server.</li><li><strong>Data Security:</strong> We do not track or store personal data.</li><li><strong>Cookies:</strong> We use Google AdSense which may use cookies to serve relevant ads.</li></ul>`,
+        terms: `<h2>Terms of Service</h2><p>By using StudentScan Pro, you agree to use this tool for lawful academic purposes. We provide this service "as is" and are not responsible for formatting errors or data loss. Users must ensure they have the rights to any content they convert.</p>`,
+        contact: `<h2>Contact Us</h2><p>We are always looking to improve! If you have suggestions, bug reports, or partnership inquiries, please reach out.</p><p style="background: #f1f5f9; padding: 15px; border-left: 4px solid #2563eb;"><strong>Official Email:</strong> shahrozali.lap@gmail.com</p>`
+    };
 
-    function openLegal(id) {
-        document.getElementById('legalContent').innerHTML = legalData[id];
-        document.getElementById('legalModal').style.display = 'block';
-        document.body.style.overflow = 'hidden';
-    }
-    function closeLegal() { 
-        document.getElementById('legalModal').style.display = 'none'; 
-        document.body.style.overflow = 'auto';
-    }
+    function openLegal(id) {
+        document.getElementById('legalContent').innerHTML = legalData[id];
+        document.getElementById('legalModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+    function closeLegal() { 
+        document.getElementById('legalModal').style.display = 'none'; 
+        document.body.style.overflow = 'auto';
+    }
 </script>
 </body>
 </html>
