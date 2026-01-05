@@ -163,6 +163,7 @@
         if (filesArray.length === 0) return alert("Please select images!");
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
+        const studentNameRaw = document.getElementById('name').value.toUpperCase() || "STUDENT";
         status.innerText = "Compressing & generating...";
         
         try {
@@ -190,18 +191,28 @@
                     doc.setFontSize(18);
                     doc.text(document.getElementById('subject').value.toUpperCase() || "ACADEMIC DOCUMENT", 15, 18);
                     doc.setFontSize(10);
-                    doc.text(`NAME: ${document.getElementById('name').value.toUpperCase() || "STUDENT"}`, 15, 30);
+                    doc.text(`NAME: ${studentNameRaw}`, 15, 30);
                     doc.text(`DATE: ${new Date().toLocaleDateString()}`, 15, 36);
                     y = 50;
                 }
                 const props = doc.getImageProperties(imgData);
                 const w = 180;
                 const h = (props.height * w) / props.width;
-                doc.addImage(imgData, 'JPEG', 15, y, w, Math.min(h, 280 - y));
+                doc.addImage(imgData, 'JPEG', 15, y, w, Math.min(h, 275 - y));
                 
-                doc.setTextColor(150);
+                // --- NEW PDF FOOTER STYLE ---
+                doc.setDrawColor(226, 232, 240); 
+                doc.line(15, 285, 195, 285);     
+                
+                doc.setTextColor(150); 
                 doc.setFontSize(8);
-                doc.text(`Page ${i+1} of ${filesArray.length} | StudentScan Pro`, 105, 290, {align: 'center'});
+                
+                // Left Side
+                doc.text(`STUDENT NAME: ${studentNameRaw} / STUDENTSCAN PRO`, 15, 292);
+                
+                // Right Side
+                doc.text(`PAGE ${i+1} OF ${filesArray.length}`, 195, 292, {align: 'right'});
+                // ----------------------------
             }
             doc.save(`StudentScan_${Date.now()}.pdf`);
             status.innerText = "Downloaded Successfully!";
