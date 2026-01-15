@@ -91,7 +91,7 @@
 </div>
 
 <footer>
-    <p>&copy; 2025 StudentScan Pro. Academic Utility Suite.</p>
+    <p>&copy; <span id="displayYear"></span> StudentScan Pro. Academic Utility Suite.</p>
     <div class="footer-links">
         <a href="javascript:void(0)" onclick="openLegal('about')">About Us</a> |
         <a href="javascript:void(0)" onclick="openLegal('privacy')">Privacy Policy</a> |
@@ -110,6 +110,12 @@
 <script>
     let filesArray = [];
     const status = document.getElementById('status');
+
+    // Automatically update the year in the footer
+    window.onload = function() {
+        const currentYear = new Date().getFullYear();
+        document.getElementById('displayYear').innerText = currentYear;
+    };
 
     document.getElementById('fileIn').addEventListener('change', function(e) {
         const selected = Array.from(e.target.files);
@@ -163,6 +169,7 @@
         if (filesArray.length === 0) return alert("Please select images!");
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
+        const headerEnabled = document.getElementById('useHeader').checked;
         const studentNameRaw = document.getElementById('name').value.toUpperCase() || "STUDENT";
         status.innerText = "Compressing & generating...";
         
@@ -184,7 +191,7 @@
                 });
 
                 let y = 10;
-                if (i === 0 && document.getElementById('useHeader').checked) {
+                if (i === 0 && headerEnabled) {
                     doc.setFillColor(37, 99, 235);
                     doc.rect(0, 0, 210, 42, 'F');
                     doc.setTextColor(255, 255, 255);
@@ -200,19 +207,18 @@
                 const h = (props.height * w) / props.width;
                 doc.addImage(imgData, 'JPEG', 15, y, w, Math.min(h, 275 - y));
                 
-                // --- NEW PDF FOOTER STYLE ---
                 doc.setDrawColor(226, 232, 240); 
                 doc.line(15, 285, 195, 285);     
                 
                 doc.setTextColor(150); 
                 doc.setFontSize(8);
                 
-                // Left Side
-                doc.text(`STUDENT NAME: ${studentNameRaw} / STUDENTSCAN PRO`, 15, 292);
+                // --- MODIFIED FOOTER LOGIC ---
+                const footerText = headerEnabled ? `${studentNameRaw} / STUDENTSCAN PRO` : `STUDENTSCAN PRO`;
+                doc.text(footerText, 15, 292);
+                // -----------------------------
                 
-                // Right Side
                 doc.text(`PAGE ${i+1} OF ${filesArray.length}`, 195, 292, {align: 'right'});
-                // ----------------------------
             }
             doc.save(`StudentScan_${Date.now()}.pdf`);
             status.innerText = "Downloaded Successfully!";
