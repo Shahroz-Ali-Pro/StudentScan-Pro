@@ -1,5 +1,11 @@
 const CACHE_NAME = 'studentscan-v2';
-const ASSETS = ['./', './index.html', './manifest.json', './icon.png'];
+const ASSETS = [
+  '/',
+  'index.html',
+  'manifest.json',
+  'icon.png',
+  'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'
+];
 
 self.addEventListener('install', (e) => {
     self.skipWaiting();
