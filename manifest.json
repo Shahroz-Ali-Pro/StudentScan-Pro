@@ -18,44 +18,42 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "screen1.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Home Screen"
+    },
+    {
+      "src": "screen2.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Adding Images"
+    },
+    {
+      "src": "screen3.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Custom Header"
+    },
+    {
+      "src": "screen4.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "PDF Preview"
+    },
+    {
+      "src": "screen5.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Sharing PDF"
+    }
   ]
 }
-"screenshots": [
-  {
-    "src": "screen1.png",
-    "sizes": "1080x1920",
-    "type": "image/png",
-    "form_factor": "narrow",
-    "label": "Home Screen"
-  },
-  {
-    "src": "screen2.png",
-    "sizes": "1080x1920",
-    "type": "image/png",
-    "form_factor": "narrow",
-    "label": "Adding Images"
-  },
-  {
-    "src": "screen3.png",
-    "sizes": "1080x1920",
-    "type": "image/png",
-    "form_factor": "narrow",
-    "label": "Custom Header"
-  },
-  {
-    "src": "screen4.png",
-    "sizes": "1080x1920",                                                                                                   
-    "type": "image/png",
-    "form_factor": "narrow",
-    "label": "PDF Preview"
-  },
-  {
-    "src": "screen5.png",
-    "sizes": "1080x1920",
-    "type": "image/png",
-    "form_factor": "narrow",
-    "label": "Sharing PDF"
-  }
-]
-
-
