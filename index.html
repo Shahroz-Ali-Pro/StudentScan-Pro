@@ -6,7 +6,7 @@
     <title>StudentScan Pro | Academic Image to PDF Suite</title>
     <meta name="description" content="The ultimate student tool. Convert assignment photos to professional PDFs with academic headers. Works offline and secure.">
     
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
@@ -75,6 +75,10 @@
 
     <button class="btn-main" onclick="generatePDF()">Generate Academic PDF</button>
     <div id="status">System Ready</div>
+
+    <button id="shareBtn" class="btn-main" style="display:none; margin-top:12px; background:#16a34a; box-shadow: 0 4px 12px rgba(22,163,74,0.2);">
+        Share PDF to WhatsApp / Email
+    </button>
 </div>
 
 <div class="container">
@@ -109,6 +113,8 @@
 
 <script>
     let filesArray = [];
+    let currentPdfBlob = null;
+    let currentFileName = "";
     const status = document.getElementById('status');
 
     // Automatically update the year in the footer
@@ -200,8 +206,8 @@
                     doc.setFontSize(10);
                     doc.text(`NAME: ${studentNameRaw}`, 15, 30);
                     const d = new Date();
-const dateStr = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
-doc.text(`DATE: ${dateStr}`, 15, 36);
+                    const dateStr = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+                    doc.text(`DATE: ${dateStr}`, 15, 36);
                     y = 50;
                 }
                 const props = doc.getImageProperties(imgData);
@@ -215,19 +221,38 @@ doc.text(`DATE: ${dateStr}`, 15, 36);
                 doc.setTextColor(150); 
                 doc.setFontSize(8);
                 
-                // --- MODIFIED FOOTER LOGIC ---
                 const footerText = headerEnabled ? `${studentNameRaw} / STUDENTSCAN PRO` : `STUDENTSCAN PRO`;
                 doc.text(footerText, 15, 292);
-                // -----------------------------
                 
                 doc.text(`PAGE ${i+1} OF ${filesArray.length}`, 195, 292, {align: 'right'});
             }
-            doc.save(`StudentScan_${Date.now()}.pdf`);
+            
+            currentPdfBlob = doc.output('blob');
+            currentFileName = `StudentScan_${Date.now()}.pdf`;
+            doc.save(currentFileName);
+            
             status.innerText = "Downloaded Successfully!";
+            if (navigator.share) {
+                document.getElementById('shareBtn').style.display = 'block';
+            }
         } catch (e) {
             status.innerText = "Error. Try with fewer images.";
         }
     }
+
+    document.getElementById('shareBtn').addEventListener('click', async () => {
+        if (!currentPdfBlob) return;
+        const file = new File([currentPdfBlob], currentFileName, { type: 'application/pdf' });
+        try {
+            await navigator.share({
+                files: [file],
+                title: 'StudentScan PDF',
+                text: 'Scanned assignment ready for submission.'
+            });
+        } catch (err) {
+            console.log("Share cancelled");
+        }
+    });
 
     const legalData = {
         about: `<h2>About StudentScan Pro</h2><p>StudentScan Pro is a high-utility academic tool designed for students worldwide. We help bridge the gap between handwritten notes and professional academic submissions. Our mission is to provide a fast, secure, and easy-to-use platform that automates the formatting of multi-page PDF documents with professional headers, ensuring students can focus on their learning rather than formatting.</p>`,
@@ -246,19 +271,5 @@ doc.text(`DATE: ${dateStr}`, 15, 36);
         document.body.style.overflow = 'auto';
     }
 </script>
-    <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      // Note the path: no leading slash for GitHub Pages compatibility
-      navigator.serviceWorker.register('sw.js')
-        .then(reg => console.log('Service Worker Registered!', reg))
-        .catch(err => console.error('Service Worker Registration Failed:', err));
-    });
-  }
-</script>
 </body>
 </html>
-
-
-
-
