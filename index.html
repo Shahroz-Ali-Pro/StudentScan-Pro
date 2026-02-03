@@ -16,42 +16,103 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <style>
-        :root { --blue: #2563eb; --blue-dark: #1e40af; --dark: #0f172a; --gray: #f8fafc; --border: #e2e8f0; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f1f5f9; margin: 0; color: var(--dark); line-height: 1.5; }
-        nav { background: white; padding: 1rem 5%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        h1.logo { margin: 0; font-size: 1.5rem; font-weight: 800; color: var(--blue); letter-spacing: -0.5px; }
+        :root { --blue: #2563eb; --blue-dark: #1e40af; --dark: #0f172a; --gray: #f8fafc; --border: #e2e8f0; --success: #16a34a; --bg: #f1f5f9; --card-bg: #ffffff; --text: #0f172a; --sub-text: #64748b; }
+        
+        /* Dark Mode variables */
+        [data-theme="dark"] { --bg: #0f172a; --card-bg: #1e293b; --text: #f1f5f9; --sub-text: #94a3b8; --border: #334155; --gray: #1e293b; }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: background 0.3s, color 0.3s; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; color: var(--text); line-height: 1.5; }
+        
+        nav { background: var(--card-bg); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        h1.logo { margin: 0; font-size: 1.3rem; font-weight: 800; color: var(--blue); letter-spacing: -0.5px; cursor: pointer; }
+        .back-btn { background: var(--gray); border: 1px solid var(--border); padding: 6px 15px; border-radius: 8px; font-weight: 700; color: var(--blue); cursor: pointer; display: none; }
+
         .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
-        .card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; border: 1px solid var(--border); }
-        .card-title { font-size: 0.9rem; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 15px; display: block; }
-        label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: #475569; }
-        input[type="text"] { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 1rem; margin-bottom: 15px; }
-        .toggle-box { display: flex; align-items: center; gap: 10px; background: var(--gray); padding: 12px; border-radius: 10px; margin-bottom: 15px; cursor: pointer; }
+        
+        .view { display: none; animation: slideIn 0.3s ease-out; }
+        .view.active { display: block; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 10px; }
+        .menu-card { background: var(--card-bg); padding: 25px; border-radius: 16px; border: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; gap: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .menu-card:hover { border-color: var(--blue); transform: scale(1.01); }
+        .menu-icon { font-size: 2rem; background: #eff6ff; padding: 15px; border-radius: 12px; }
+
+        .card { background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 20px; border: 1px solid var(--border); }
+        .card-title { font-size: 0.9rem; font-weight: 700; color: var(--sub-text); text-transform: uppercase; margin-bottom: 15px; display: block; }
+        label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; color: var(--sub-text); }
+        input[type="text"] { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 1rem; margin-bottom: 15px; background: var(--bg); color: var(--text); }
+        .toggle-box { display: flex; align-items: center; gap: 10px; background: var(--gray); padding: 12px; border-radius: 10px; margin-bottom: 15px; cursor: pointer; color: var(--text); }
         .upload-area { display: block; border: 2px dashed #cbd5e1; padding: 30px 20px; text-align: center; border-radius: 12px; cursor: pointer; background: var(--gray); transition: 0.3s; }
-        .upload-area:hover { border-color: var(--blue); background: #eff6ff; }
+        
         .gallery { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .thumb { display: flex; align-items: center; background: white; padding: 10px; border-radius: 12px; border: 1px solid var(--border); gap: 12px; }
+        .thumb { display: flex; align-items: center; background: var(--card-bg); padding: 10px; border-radius: 12px; border: 1px solid var(--border); gap: 12px; }
         .thumb img { width: 55px; height: 55px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
         .controls { display: flex; gap: 5px; margin-left: auto; }
         .btn-ctrl { padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; }
-        .btn-move { background: #f1f5f9; color: var(--blue); }
+        .btn-move { background: var(--gray); color: var(--blue); }
         .btn-del { background: #fee2e2; color: #ef4444; }
         .btn-main { width: 100%; background: var(--blue); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+        
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; }
+        .history-meta { display: flex; flex-direction: column; gap: 2px; }
+        .history-name { font-weight: 700; color: var(--text); font-size: 0.9rem; }
+        .history-date { font-size: 0.75rem; color: var(--sub-text); }
+        .history-actions { display: flex; gap: 8px; }
+        .history-btn { background: var(--blue); color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.75rem; font-weight: 700; border: none; cursor: pointer; }
+        .history-btn.share { background: var(--success); }
+
+        .settings-btn { background: var(--gray); border: 1px solid var(--border); padding: 10px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--text); width: 100%; margin-top: 10px; }
+
         #status { text-align: center; margin-top: 12px; font-size: 0.85rem; font-weight: 600; color: var(--blue); }
-        footer { text-align: center; padding: 40px 20px; font-size: 0.8rem; color: #94a3b8; border-top: 1px solid var(--border); }
+        footer { text-align: center; padding: 40px 20px; font-size: 0.8rem; color: var(--sub-text); border-top: 1px solid var(--border); }
         .footer-links { margin-top: 10px; }
         .footer-links a { color: var(--blue); text-decoration: none; margin: 0 8px; font-weight: 600; }
         .modal { display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:1000; padding: 20px; overflow-y: auto; }
-        .modal-content { background:white; padding:25px; border-radius:15px; max-width:550px; margin: 40px auto; position:relative; text-align: left; }
+        .modal-content { background:var(--card-bg); padding:25px; border-radius:15px; max-width:550px; margin: 40px auto; position:relative; text-align: left; color: var(--text); }
     </style>
 </head>
 <body>
 
-<nav><h1 class="logo">STUDENTSCAN PRO</h1></nav>
+<nav>
+    <h1 class="logo" onclick="showView('home')">STUDENTSCAN PRO</h1>
+    <button class="back-btn" id="backBtn" onclick="showView('home')">← EXIT</button>
+</nav>
 
-<div class="container">
+<div id="view-home" class="container view active">
+    <div style="text-align: center; margin-bottom: 25px;">
+        <h2 style="font-size: 1.5rem; margin-bottom: 5px;">Academic Suite</h2>
+        <p style="color: var(--sub-text); font-size: 0.9rem;">Choose an action to continue</p>
+    </div>
+    
+    <div class="menu-grid">
+        <div class="menu-card" onclick="showView('generator')">
+            <div class="menu-icon">📄</div>
+            <div>
+                <h3 style="margin:0; color:var(--blue);">New Assignment</h3>
+                <p style="margin:0; font-size:0.8rem; color:var(--sub-text);">Convert photos to academic PDF</p>
+            </div>
+        </div>
+        
+        <div class="menu-card" onclick="showView('library')">
+            <div class="menu-icon">📚</div>
+            <div>
+                <h3 style="margin:0; color:var(--blue);">PDF Library</h3>
+                <p style="margin:0; font-size:0.8rem; color:var(--sub-text);">View and share saved history</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 30px; color: var(--sub-text); font-size: 0.95rem;">
+        <h2 style="color: var(--text); font-size: 1.2rem;">Professional PDF Formatting for Students</h2>
+        <p>StudentScan Pro is designed to bridge the gap between physical notes and digital submissions. Our tool ensures your assignments look professional without the need for expensive scanning equipment.</p>
+    </div>
+</div>
+
+<div id="view-generator" class="container view">
     <div class="card">
-        <span class="card-title">1. Header Information</span>
+        <span class="card-title">1. Document Details</span>
         <label class="toggle-box" for="useHeader">
             <input type="checkbox" id="useHeader" checked>
             <span>Add Professional Header (Page 1)</span>
@@ -76,22 +137,18 @@
 
     <button class="btn-main" onclick="generatePDF()">Generate Academic PDF</button>
     <div id="status">System Ready</div>
-
-    <button id="shareBtn" class="btn-main" style="display:none; margin-top:12px; background:#16a34a; box-shadow: 0 4px 12px rgba(22,163,74,0.2);">
-        Share PDF to WhatsApp / Email
-    </button>
+    <button id="shareBtn" class="btn-main" style="display:none; margin-top:12px; background:#16a34a;">Share PDF to WhatsApp / Email</button>
 </div>
 
-<div class="container">
-    <div class="card" style="color: #475569; font-size: 0.95rem;">
-        <h2 style="color: var(--dark); font-size: 1.2rem;">Professional PDF Formatting for Students</h2>
-        <p>StudentScan Pro is designed to bridge the gap between physical notes and digital submissions. Our tool ensures your assignments look professional without the need for expensive scanning equipment.</p>
-        <h3 style="color: var(--blue); font-size: 1rem;">Key Benefits:</h3>
-        <ul>
-            <li><strong>Offline Security:</strong> No data is uploaded; your privacy is guaranteed.</li>
-            <li><strong>Optimized Files:</strong> Higher quality with lower file sizes.</li>
-            <li><strong>Standard Formatting:</strong> Built-in support for academic headers.</li>
-        </ul>
+<div id="view-library" class="container view">
+    <div class="card">
+        <span class="card-title">History & Library</span>
+        <div id="historyList"><p style="text-align:center; color:var(--sub-text);">No history found yet.</p></div>
+        
+        <hr style="border:0; border-top:1px solid var(--border); margin:20px 0;">
+        <button class="settings-btn" onclick="toggleDarkMode()">🌓 Toggle Dark / Light Mode</button>
+        <button class="settings-btn" onclick="window.open('https://play.google.com/store/apps/details?id=YOUR_APP_ID', '_blank')">⭐ Rate us on Play Store</button>
+        <button onclick="clearHistory()" style="width:100%; background:none; border:none; color:#ef4444; margin-top:20px; font-weight:700; cursor:pointer;">CLEAR ALL HISTORY</button>
     </div>
 </div>
 
@@ -107,7 +164,7 @@
 
 <div id="legalModal" class="modal">
     <div class="modal-content">
-        <span style="position:absolute; right:15px; top:10px; cursor:pointer; font-size:28px; color:#999;" onclick="closeLegal()">&times;</span>
+        <span style="position:absolute; right:15px; top:10px; cursor:pointer; font-size:28px;" onclick="closeLegal()">&times;</span>
         <div id="legalContent"></div>
     </div>
 </div>
@@ -116,23 +173,42 @@
     let filesArray = [];
     let currentPdfBlob = null;
     let currentFileName = "";
+    let db;
     const status = document.getElementById('status');
 
-    // Automatically update the year in the footer
+    function showView(viewName) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.getElementById('view-' + viewName).classList.add('active');
+        document.getElementById('backBtn').style.display = (viewName === 'home') ? 'none' : 'block';
+        if(viewName === 'library') loadLibrary();
+        window.scrollTo(0,0);
+    }
+
+    const dbReq = indexedDB.open("StudentScanDB", 1);
+    dbReq.onupgradeneeded = e => {
+        db = e.target.result;
+        db.createObjectStore("pdfs", { keyPath: "id", autoIncrement: true });
+    };
+    dbReq.onsuccess = e => { db = e.target.result; };
+
+    function toggleDarkMode() {
+        const theme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.body.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }
+
     window.onload = function() {
         const currentYear = new Date().getFullYear();
         document.getElementById('displayYear').innerText = currentYear;
+        const savedTheme = localStorage.getItem('theme');
+        if(savedTheme) document.body.setAttribute('data-theme', savedTheme);
     };
 
     document.getElementById('fileIn').addEventListener('change', function(e) {
         const selected = Array.from(e.target.files);
         selected.forEach(file => {
             if (file.type.startsWith('image/')) {
-                filesArray.push({ 
-                    id: Date.now()+Math.random(), 
-                    data: file, 
-                    url: URL.createObjectURL(file) 
-                });
+                filesArray.push({ id: Date.now()+Math.random(), data: file, url: URL.createObjectURL(file) });
             }
         });
         updateUI();
@@ -147,13 +223,12 @@
             div.className = 'thumb';
             div.innerHTML = `
                 <img src="${f.url}">
-                <div style="flex:1; font-weight:600; font-size:0.9rem; color:#64748b;">Page ${i+1}</div>
+                <div style="flex:1; font-weight:600; font-size:0.9rem; color:var(--sub-text);">Page ${i+1}</div>
                 <div class="controls">
                     <button class="btn-ctrl btn-move" onclick="move(${i}, -1)">↑</button>
                     <button class="btn-ctrl btn-move" onclick="move(${i}, 1)">↓</button>
                     <button class="btn-ctrl btn-del" onclick="remove(${i})">×</button>
-                </div>
-            `;
+                </div>`;
             gall.appendChild(div);
         });
         status.innerText = filesArray.length > 0 ? `${filesArray.length} images ready` : "Ready";
@@ -178,6 +253,9 @@
         const doc = new jsPDF();
         const headerEnabled = document.getElementById('useHeader').checked;
         const studentNameRaw = document.getElementById('name').value.toUpperCase() || "STUDENT";
+        const subjectValue = document.getElementById('subject').value.trim();
+        const subjectTitle = subjectValue.toUpperCase() || "ACADEMIC DOCUMENT";
+        currentFileName = subjectValue ? `${subjectValue}.pdf` : `StudentScan_${Date.now()}.pdf`;
         status.innerText = "Compressing & generating...";
         
         try {
@@ -203,63 +281,99 @@
                     doc.rect(0, 0, 210, 42, 'F');
                     doc.setTextColor(255, 255, 255);
                     doc.setFontSize(18);
-                    doc.text(document.getElementById('subject').value.toUpperCase() || "ACADEMIC DOCUMENT", 15, 18);
+                    doc.text(subjectTitle, 15, 18);
                     doc.setFontSize(10);
                     doc.text(`NAME: ${studentNameRaw}`, 15, 30);
                     const d = new Date();
-                    const dateStr = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
-                    doc.text(`DATE: ${dateStr}`, 15, 36);
+                    doc.text(`DATE: ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`, 15, 36);
                     y = 50;
                 }
                 const props = doc.getImageProperties(imgData);
                 const w = 180;
                 const h = (props.height * w) / props.width;
                 doc.addImage(imgData, 'JPEG', 15, y, w, Math.min(h, 275 - y));
-                
                 doc.setDrawColor(226, 232, 240); 
                 doc.line(15, 285, 195, 285);     
-                
                 doc.setTextColor(150); 
                 doc.setFontSize(8);
-                
                 const footerText = headerEnabled ? `${studentNameRaw} / STUDENTSCAN PRO` : `STUDENTSCAN PRO`;
                 doc.text(footerText, 15, 292);
-                
                 doc.text(`PAGE ${i+1} OF ${filesArray.length}`, 195, 292, {align: 'right'});
             }
-            
             currentPdfBlob = doc.output('blob');
-            currentFileName = `StudentScan_${Date.now()}.pdf`;
             doc.save(currentFileName);
-            
+            saveToHistory(currentFileName, currentPdfBlob);
             status.innerText = "Downloaded Successfully!";
-            if (navigator.share) {
-                document.getElementById('shareBtn').style.display = 'block';
+            if (navigator.share) document.getElementById('shareBtn').style.display = 'block';
+        } catch (e) { status.innerText = "Error. Try with fewer images."; }
+    }
+
+    function saveToHistory(name, blob) {
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+            const tx = db.transaction("pdfs", "readwrite");
+            tx.objectStore("pdfs").add({ name: name, date: new Date().toLocaleString(), data: reader.result });
+        };
+    }
+
+    function loadLibrary() {
+        const container = document.getElementById('historyList');
+        const tx = db.transaction("pdfs", "readonly");
+        tx.objectStore("pdfs").getAll().onsuccess = (e) => {
+            const items = e.target.result.reverse();
+            if(items.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:var(--sub-text);">No PDFs saved.</p>';
+                return;
             }
-        } catch (e) {
-            status.innerText = "Error. Try with fewer images.";
+            container.innerHTML = items.map((item) => `
+                <div class="history-item">
+                    <div class="history-meta">
+                        <span class="history-name">${item.name}</span>
+                        <span class="history-date">${item.date}</span>
+                    </div>
+                    <div class="history-actions">
+                        <button onclick="viewPdf('${item.data}')" class="history-btn">View</button>
+                        <button onclick="sharePdfFromLibrary('${item.data}', '${item.name}')" class="history-btn share">Share</button>
+                    </div>
+                </div>`).join('');
+        };
+    }
+
+    function viewPdf(dataUrl) {
+        const win = window.open();
+        win.document.write('<iframe src="' + dataUrl + '" frameborder="0" style="border:0; width:100%; height:100%;" allowfullscreen></iframe>');
+    }
+
+    async function sharePdfFromLibrary(dataUrl, name) {
+        const blob = await (await fetch(dataUrl)).blob();
+        const file = new File([blob], name, { type: 'application/pdf' });
+        if (navigator.share) {
+            try { await navigator.share({ files: [file], title: 'StudentScan PDF', text: 'Scanned Assignment' }); } 
+            catch (err) { console.log("Share cancelled"); }
+        } else { alert("Sharing not supported on this browser."); }
+    }
+
+    function clearHistory() {
+        if(confirm("Delete all history?")) {
+            const tx = db.transaction("pdfs", "readwrite");
+            tx.objectStore("pdfs").clear();
+            tx.oncomplete = () => loadLibrary();
         }
     }
 
     document.getElementById('shareBtn').addEventListener('click', async () => {
         if (!currentPdfBlob) return;
         const file = new File([currentPdfBlob], currentFileName, { type: 'application/pdf' });
-        try {
-            await navigator.share({
-                files: [file],
-                title: 'StudentScan PDF',
-                text: 'Scanned assignment ready for submission.'
-            });
-        } catch (err) {
-            console.log("Share cancelled");
-        }
+        try { await navigator.share({ files: [file], title: 'StudentScan PDF', text: 'Scanned assignment ready.' }); } 
+        catch (err) { console.log("Share cancelled"); }
     });
 
     const legalData = {
-        about: `<h2>About StudentScan Pro</h2><p>StudentScan Pro is a high-utility academic tool designed for students worldwide. We help bridge the gap between handwritten notes and professional academic submissions. Our mission is to provide a fast, secure, and easy-to-use platform that automates the formatting of multi-page PDF documents with professional headers, ensuring students can focus on their learning rather than formatting.</p>`,
-        privacy: `<h2>Privacy Policy</h2><p>Your privacy is our absolute priority. StudentScan Pro operates entirely within your browser.</p><ul><li><strong>No Image Storage:</strong> Images are processed locally and never uploaded to any server.</li><li><strong>Data Security:</strong> We do not track or store personal data.</li><li><strong>Cookies:</strong> We use Google AdSense which may use cookies to serve relevant ads.</li></ul>`,
-        terms: `<h2>Terms of Service</h2><p>By using StudentScan Pro, you agree to use this tool for lawful academic purposes. We provide this service "as is" and are not responsible for formatting errors or data loss. Users must ensure they have the rights to any content they convert.</p>`,
-        contact: `<h2>Contact Us</h2><p>We are always looking to improve! If you have suggestions, bug reports, or partnership inquiries, please reach out.</p><p style="background: #f1f5f9; padding: 15px; border-left: 4px solid #2563eb;"><strong>Official Email:</strong> studentscanpro@gmail.com</p>`
+        about: `<h2>About StudentScan Pro</h2><p>StudentScan Pro is a high-utility academic tool designed for students worldwide. We bridge the gap between physical notes and professional digital submissions. Our mission is to provide students with a fast, private, and secure way to format their coursework without needing expensive hardware or complex software.</p>`,
+        privacy: `<h2>Privacy Policy</h2><p><strong>Last Updated: 2026</strong></p><p>Your privacy is our absolute priority. StudentScan Pro is built with a "Privacy First" architecture:</p><ul><li><strong>Local Processing:</strong> All image-to-PDF conversions happen directly in your browser or on your device. Your images are never uploaded to any external server.</li><li><strong>No Data Collection:</strong> We do not collect, store, or sell any personal student data, images, or documents.</li><li><strong>Local Storage:</strong> Your PDF history is stored locally on your device using IndexedDB and is only accessible by you.</li><li><strong>Third-Party Services:</strong> We may use Google AdMob for advertising. AdMob may collect device identifiers to serve relevant ads. Please refer to Google's Privacy Policy for more details.</li></ul>`,
+        terms: `<h2>Terms of Service</h2><p>By using StudentScan Pro, you agree to the following:</p><ul><li>The app is provided "as-is" for academic and personal use.</li><li>You are responsible for the content you convert and must ensure you have the rights to said content.</li><li>We are not responsible for any document loss due to browser cache clearing or device issues.</li><li>The automatic header is a formatting tool; please ensure it meets your specific institution's guidelines.</li></ul>`,
+        contact: `<h2>Contact Us</h2><p>We value student feedback! If you have suggestions, feature requests, or bug reports, please reach out to our team.</p><div style="background: var(--gray); padding: 15px; border-radius: 10px; border-left: 4px solid var(--blue);"><strong>Official Email:</strong> studentscanpro@gmail.com</div>`
     };
 
     function openLegal(id) {
@@ -272,7 +386,14 @@
         document.body.style.overflow = 'auto';
     }
 </script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('StudentScan SW Registered!'))
+        .catch(err => console.log('SW Registration Failed:', err));
+    });
+  }
+</script>
 </body>
 </html>
-
-
